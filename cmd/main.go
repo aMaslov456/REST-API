@@ -1,15 +1,14 @@
 package main
 
 import (
-	todo "github.com/aMaslov456/REST-API"
-	handler "github.com/aMaslov456/REST-API/pkg/handler"
+	"github.com/aMaslov456/REST-API"
+	"github.com/aMaslov456/REST-API/pkg/handler"
 	"github.com/aMaslov456/REST-API/pkg/repository"
 	"github.com/aMaslov456/REST-API/pkg/service"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 )
 
@@ -40,9 +39,11 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	srv := new(todo.Server)
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		log.Fatalf("error occured while running http server: %s", err.Error())
-	}
+	go func() {
+		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+			logrus.Fatalf("error occured while running http server: %s", err.Error())
+		}
+	}()
 }
 func initConfig() error {
 	viper.AddConfigPath("configs")
